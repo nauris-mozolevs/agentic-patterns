@@ -6,6 +6,7 @@ import re
 
 load_dotenv()
 
+# Local model config (if used)
 config_list = [
     {
         "model": "llama3.2:3b",
@@ -18,12 +19,13 @@ model = "gpt-4o-mini"
 
 api_key = os.environ["OPENAI_API_KEY"]
 
-# == Uncomment the following line to use OpenAI API ==
+# Uncomment the following line to use OpenAI API
 llm_config = {"model": model, "temperature": 0.0, "api_key": api_key}
 
-# == Using the local Ollama model ==
+# Uncomment when using the local Ollama model
 #llm_config = {"config_list": config_list, "temperature": 0.0}
 
+# Input topic and word count
 # e.g. AI Agentic Workflows
 topic = input("Enter your topic: ")
 print(f"topic is: {topic}")
@@ -31,6 +33,7 @@ print(f"topic is: {topic}")
 words = int(input("Enter your word count: "))
 print(f"word count is: {words}")
 
+# Preview task description
 task = f"""
        Write a concise, engaging article about {topic}. Make sure the article is
        within {words} words.
@@ -48,7 +51,6 @@ writer = AssistantAgent(
 
 reply = writer.generate_reply(messages=[{"content": task, "role": "user"}])
 
-
 critic = AssistantAgent(
     name="Critic",
     is_termination_msg=lambda x: x.get("content", "").find("TERMINATE") >= 0,
@@ -62,7 +64,7 @@ res = critic.initiate_chat(
     recipient=writer, message=task, max_turns=3, summary_method="last_msg"
 )
 
-# === Add a SEO reviewer agent to suggest SEO improvements ===
+# Add a SEO reviewer agent to suggest SEO improvements
 SEO_reviewer = AssistantAgent(
     name="SEO-Reviewer",
     llm_config=llm_config,
@@ -74,7 +76,7 @@ SEO_reviewer = AssistantAgent(
     "Begin the review by stating your role, like 'SEO Reviewer:'.",
 )
 
-# == Add a compliance reviewer agent to suggest compliance improvements ==
+# Add a compliance reviewer agent to suggest compliance improvements
 compliance_reviewer = AssistantAgent(
     name="Compliance-Reviewer",
     llm_config=llm_config,
@@ -83,7 +85,7 @@ compliance_reviewer = AssistantAgent(
     "Begin the review by stating your role, like 'Compliance Reviewer:'.",
 )
 
-# == Meta-reviewer agent to provide a final review of the content ==
+# Meta-reviewer agent to provide a final review of the content
 meta_reviewer = AssistantAgent(
     name="Meta-Reviewer",
     llm_config=llm_config,
@@ -93,7 +95,7 @@ meta_reviewer = AssistantAgent(
 )
 
 
-# == Orchestrate the conversation between the agents and nested chats to solve the task ==
+# Orchestrate the conversation between the agents and nested chats to solve the task
 def reflection_message(recipient, messages, sender, config):
     return f"""Review the following content. 
             \n\n {recipient.chat_messages_for_summary(sender)[-1]['content']}"""
@@ -130,7 +132,7 @@ review_chats = [
 # Register reviewers and orchestrate the conversation
 critic.register_nested_chats(review_chats, trigger=writer)
 
-# Run the show!
+# Run!
 res = critic.initiate_chat(
     recipient=writer, message=task, max_turns=2, summary_method="last_msg"
 )
@@ -139,10 +141,9 @@ res = critic.initiate_chat(
 print("\n\n == Summary ==\n")
 print(res.summary)
 
+# Write final result to file
 def normalize_filename(topic):
-    # Replace whitespaces with hyphens and remove invalid characters
     normalized = re.sub(r'\s+', '-', topic.strip())
-    # Remove characters invalid for filenames (basic sanitization)
     normalized = re.sub(r'[<>:"/\\|?*]', '', normalized)
     return normalized + ".txt" if normalized else "default-topic.txt"
 
