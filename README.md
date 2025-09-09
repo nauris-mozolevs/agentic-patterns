@@ -1,4 +1,8 @@
 # agentic-patterns
+* reflection :white_check_mark:
+* tool use :x:
+* planning :x:
+* multi-agent :x:
 
 ## Reflection Pattern Example
 ### Overview
