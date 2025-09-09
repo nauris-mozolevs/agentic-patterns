@@ -25,3 +25,5 @@ Output: Prints the final, polished response.
 * Python 3.8+
 * Ollama model for local LLM execution
 * autogen
+
+![screenshot](https://github.com/nauris-mozolevs/agentic-patterns/blob/main/img/reflect.png)
