@@ -18,7 +18,8 @@ The process iterates for a specified number of steps (n_steps=10) to refine the 
 Output: Prints the final, polished response.
 
 ### Run the script:
-python reflection.py
+* configure local model (config_list) or OPENAI_API_KEY (.env file)
+* python reflection.py
 
 ### Dependencies
 * Python 3.8+
